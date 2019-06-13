@@ -55,7 +55,7 @@ abstract class EntityFactoryBase: EntityFactory {
     /**
      * Initialize the entity factory.
      */
-    protected abstract fun doInit(world: World)
+    protected fun doInit(world: World) {}
 
     /**
      * Create an entity instance.

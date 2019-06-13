@@ -2,6 +2,7 @@ package org.entityflakes.entityfactory
 
 import org.entityflakes.Entity
 import org.entityflakes.World
+import org.mistutils.random.RandomSequence
 import org.mistutils.symbol.Symbol
 import java.lang.IllegalStateException
 
@@ -15,6 +16,8 @@ abstract class EntityFactoryBase: EntityFactory {
     private lateinit var registeredFactoryId: Symbol
 
     private val emptyParams: Map<Symbol, Any> = emptyMap()
+    private val random = RandomSequence.createDefault()
+
 
     /**
      * The world that this EntityFactory is added to.
@@ -49,20 +52,24 @@ abstract class EntityFactoryBase: EntityFactory {
         val seed = (randomSeed ?: (System.nanoTime() + world.entityCount))
         val params = parameters ?: emptyParams
 
-        return doCreateEntity(world, seed, params)
+        random.setSeed(seed)
+
+        val entity = world.createEntity()
+        doCreateEntity(entity, random, params)
+        return entity
     }
 
     /**
      * Initialize the entity factory.
      */
-    protected fun doInit(world: World) {}
+    protected open fun doInit(world: World) {}
 
     /**
-     * Create an entity instance.
+     * Initialize the specified [entity].
      *
-     * The random seed is either the one passed in to createEntity, or based on the current system nano time.
-     * The parameters are either the ones passed in to createEntity, or an empty map if no parameters given-
+     * The [random] is initialized either with the seed the passed in to createEntity, or based on the current system nano time.
+     * The [parameters] are either the ones passed in to createEntity, or an empty map if no parameters given-
      */
-    protected abstract fun doCreateEntity(world: World, randomSeed: Long, parameters: Map<Symbol, Any>): Entity
+    protected abstract fun doCreateEntity(entity: Entity, random: RandomSequence, parameters: Map<Symbol, Any>)
 
 }

@@ -2,7 +2,6 @@ package org.entityflakes.entityfactory
 
 import org.entityflakes.Component
 import org.entityflakes.Entity
-import org.entityflakes.World
 import org.mistutils.random.RandomSequence
 import org.mistutils.symbol.Symbol
 import java.util.HashMap
@@ -28,12 +27,7 @@ class DefaultEntityFactory(vararg componentTypes: KClass<out Component>): Entity
     var entityInitializer: (InitializationContext.(entity: Entity) -> Unit)? = null
 
 
-    private val random = RandomSequence.createDefault()
-    private lateinit var context: InitializationContextImpl
-
-    override fun doInit(world: World) {
-        context = InitializationContextImpl(world, random)
-    }
+    private val context: InitializationContextImpl = InitializationContextImpl()
 
     /**
      * Specify initializer to run for the specified [componentType] when creating entities of this entityfactory.
@@ -46,14 +40,17 @@ class DefaultEntityFactory(vararg componentTypes: KClass<out Component>): Entity
         initializers[componentType] = initializer as InitializationContext.(component: Component) -> Unit
     }
 
-    override fun doCreateEntity(world: World, randomSeed: Long, parameters: Map<Symbol, Any>): Entity {
 
-        // Create entity
-        val entity = world.createEntity()
+    override fun doCreateEntity(entity: Entity, random: RandomSequence, parameters: Map<Symbol, Any>) {
+
+        // Create seed to be used for initializing the components and final setup
+        val entitySeed = random.nextLong()
 
         // Initialization context
         context.params = parameters
         context.entity = entity
+        context.world = world
+        context.random = random
 
         // Create components
         for (componentType in componentTypes) {
@@ -64,7 +61,7 @@ class DefaultEntityFactory(vararg componentTypes: KClass<out Component>): Entity
             val initializer = initializers[componentType]
             if (initializer != null) {
                 // Initialize random seed for the component, base it on the component type as well.
-                random.setSeed(randomSeed, componentType.hashCode().toLong())
+                random.setSeed(entitySeed, componentType.hashCode().toLong())
 
                 // Invoke initializer
                 context.initializer(component)
@@ -74,11 +71,9 @@ class DefaultEntityFactory(vararg componentTypes: KClass<out Component>): Entity
         // Do any final entity initialization
         val entityInit = entityInitializer
         if (entityInit != null) {
-            random.setSeed(randomSeed)
+            random.setSeed(entitySeed)
             context.entityInit(entity)
         }
-
-        return entity
     }
 
 }

@@ -2,6 +2,7 @@ package org.entityflakes.entitymanager
 
 import org.entityflakes.Component
 import org.entityflakes.Entity
+import org.entityflakes.entityfactory.EntityFactory
 import org.entityflakes.entityfilters.EntityFilter
 import org.entityflakes.entitygroup.DynamicEntityGroup
 import org.entityflakes.entitygroup.EntityGroup
@@ -12,6 +13,7 @@ import org.mistutils.collections.bag.Bag
 import org.mistutils.collections.bag.IntBag
 import org.mistutils.symbol.Symbol
 import org.mistutils.time.Time
+import java.lang.IllegalArgumentException
 
 
 /**
@@ -35,6 +37,8 @@ class DefaultEntityManager(val maxEntityPoolSize: Int = 1024*10): ProcessorBase(
     private val inverseTaggedEntities = HashMap<Entity, MutableSet<Symbol>>()
     private var nextFreeComponentId = 1
 
+    private val entityFactories = LinkedHashMap<Symbol, EntityFactory>()
+
     private val listenerEntries = Bag<ListenerEntry>()
 
     private val tempComponentIds = BitVector()
@@ -42,6 +46,8 @@ class DefaultEntityManager(val maxEntityPoolSize: Int = 1024*10): ProcessorBase(
     override val maxComponentId: Int get() = nextFreeComponentId - 1
 
     private val groups = HashMap<EntityFilter, EntityGroup>()
+
+    override val entityCount: Int get() = entities.size()
 
     override fun createEntity(vararg components: Component): Entity {
         // Get id
@@ -67,6 +73,27 @@ class DefaultEntityManager(val maxEntityPoolSize: Int = 1024*10): ProcessorBase(
     override fun deleteEntity(entity: Entity) {
         // Handle entity deletion in the build method
         entitiesToRemove.add(entity.id)
+    }
+
+    override fun registerEntityFactory(factoryName: Symbol, factory: EntityFactory) {
+        entityFactories[factoryName] = factory
+        factory.init(world, factoryName)
+    }
+
+    override fun removeEntityFactory(factoryName: Symbol) {
+        entityFactories.remove(factoryName)
+    }
+
+    override fun getEntityFactory(factoryName: Symbol): EntityFactory? {
+        return entityFactories[factoryName]
+    }
+
+    override fun createEntity(factoryName: Symbol, randomSeed: Long?, parameters: Map<Symbol, Any>?): Entity {
+        // Get factory and throw exception if it is null
+        val factory = entityFactories[factoryName] ?: throw IllegalArgumentException("Could not create entity: No entity factory with the id '$factoryName' was found.")
+
+        // Create entity using the factory
+        return factory.createEntity(randomSeed, parameters)
     }
 
     override fun tagEntity(entity: Entity, tag: Symbol) {

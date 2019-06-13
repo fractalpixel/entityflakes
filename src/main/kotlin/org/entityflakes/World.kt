@@ -1,5 +1,6 @@
 package org.entityflakes
 
+import org.entityflakes.entityfactory.EntityFactory
 import org.entityflakes.entityfilters.RequiredComponentsFilter
 import org.entityflakes.entitymanager.ComponentRef
 import org.entityflakes.entitymanager.EntityManager
@@ -7,6 +8,7 @@ import org.entityflakes.processor.Processor
 import org.entityflakes.processor.SimpleEntityProcessor
 import org.entityflakes.processor.SimpleProcessor
 import org.mistutils.service.Service
+import org.mistutils.symbol.Symbol
 import org.mistutils.time.Time
 import org.mistutils.updating.Updating
 import org.mistutils.updating.strategies.UpdateStrategy

@@ -3,6 +3,7 @@ package org.entityflakes.entitymanager
 import org.entityflakes.Component
 import org.entityflakes.Entity
 import org.entityflakes.PolymorphicComponent
+import org.entityflakes.entityfactory.EntityFactory
 import org.entityflakes.entityfilters.AllEntitiesFilter
 import org.entityflakes.entityfilters.EntityFilter
 import org.entityflakes.entityfilters.RequiredAndForbiddenComponentsFilter
@@ -50,6 +51,31 @@ interface EntityManager {
         }
         return entity
     }
+
+    /**
+     * Register a named factory for creating ready-configured entities.
+     */
+    fun registerEntityFactory(factoryName: Symbol, factory: EntityFactory)
+
+    /**
+     * Removes a previously registered entity factory.
+     */
+    fun removeEntityFactory(factoryName: Symbol)
+
+    /**
+     * Get the entity factory with the specified name, or null if not found.
+     */
+    fun getEntityFactory(factoryName: Symbol): EntityFactory?
+
+    /**
+     * Create an entity instance using a specified, previously registered entity factory,
+     * optionally passing in a random seed and a parameter map.
+     * Throws an exception if the specified factory was not found.
+     */
+    fun createEntity(factoryName: Symbol,
+                     randomSeed: Long? = null,
+                     parameters: Map<Symbol, Any>? = null): Entity
+
 
     /**
      * Assigns an entity a tag that can be used to retrieve it later.
@@ -154,4 +180,8 @@ interface EntityManager {
     fun createEntityFilter(requiredComponentTypes: Collection<Class<out Component>>,
                            forbiddenComponentTypes: Collection<Class<out Component>>): EntityFilter = RequiredAndForbiddenComponentsFilter(this, requiredComponentTypes, forbiddenComponentTypes)
 
+    /**
+     * Number of entities in the world currently.
+     */
+    val entityCount: Int
 }

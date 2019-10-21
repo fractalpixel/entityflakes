@@ -10,8 +10,6 @@ import org.mistutils.collections.bag.Bag
 class ComponentPool<T: Component>(val type: Class<T>,
                                   val maxObjectPoolSize: Int = 1024*16) {
 
-    // TODO: Pre-allocate to try to get components allocated continuously in memory to improve caching performance.
-
     val reusable: Boolean = ReusableComponent::class.java.isAssignableFrom(type)
     val pool: Bag<T>? = if (reusable) Bag<T>(maxObjectPoolSize / 16) else null
 
@@ -41,7 +39,7 @@ class ComponentPool<T: Component>(val type: Class<T>,
      */
     fun dispose() {
         if (pool != null) {
-            for (i in 0..pool.size()-1) {
+            for (i in 0 until pool.size()) {
                 pool.get(i)?.dispose()
             }
             pool.clear()

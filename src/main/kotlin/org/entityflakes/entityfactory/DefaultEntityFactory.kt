@@ -31,7 +31,7 @@ class DefaultEntityFactory(vararg componentTypes: KClass<out Component>): Entity
 
     /**
      * Specify initializer to run for the specified [componentType] when creating entities of this entityfactory.
-     * The [initializer] has an [InitializationContext] as reciever (this value), that has a reference to the world,
+     * The [initializer] has an [InitializationContext] as receiver (this value), that has a reference to the world,
      * the entity that the component belongs to, a random sequence, and any parameters passed in to the [createEntity] function.
      */
     fun <T: Component>setComponentInitializer(componentType: KClass<T>,

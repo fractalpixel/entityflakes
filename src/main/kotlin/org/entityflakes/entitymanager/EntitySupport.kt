@@ -35,5 +35,9 @@ interface EntitySupport {
      */
     fun <T: Component> createComponent(componentId: Int): T
 
+    /**
+     * Call when component is no longer used by an entity.
+     * May reset and pool the component if it is a reusable component, otherwise disposes it.
+     */
     fun releaseComponent(componentId: Int, component: Component)
 }

@@ -8,11 +8,11 @@ import org.entityflakes.entitygroup.DynamicEntityGroup
 import org.entityflakes.entitygroup.EntityGroup
 import org.entityflakes.entitygroup.EntityGroupListener
 import org.entityflakes.processor.ProcessorBase
-import org.mistutils.collections.BitVector
-import org.mistutils.collections.bag.Bag
-import org.mistutils.collections.bag.IntBag
-import org.mistutils.symbol.Symbol
-import org.mistutils.time.Time
+import org.kwrench.collections.BitVector
+import org.kwrench.collections.bag.Bag
+import org.kwrench.collections.bag.IntBag
+import org.kwrench.symbol.Symbol
+import org.kwrench.time.Time
 import java.lang.IllegalArgumentException
 
 

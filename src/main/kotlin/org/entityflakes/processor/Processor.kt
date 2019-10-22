@@ -2,7 +2,7 @@ package org.entityflakes.processor
 
 import org.entityflakes.Disposable
 import org.entityflakes.World
-import org.mistutils.updating.Updating
+import org.kwrench.updating.Updating
 
 /**
  * Handles some process in the world.

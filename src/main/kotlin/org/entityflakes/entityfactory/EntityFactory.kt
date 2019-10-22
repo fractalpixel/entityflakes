@@ -2,7 +2,7 @@ package org.entityflakes.entityfactory
 
 import org.entityflakes.Entity
 import org.entityflakes.World
-import org.mistutils.symbol.Symbol
+import org.kwrench.symbol.Symbol
 
 /**
  * Something that can create entities for a world, typically of a certain type.

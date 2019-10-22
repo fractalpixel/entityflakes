@@ -1,6 +1,6 @@
 package org.entityflakes.entityfilters
 
-import org.mistutils.collections.BitVector
+import org.kwrench.collections.BitVector
 
 
 /**

@@ -3,7 +3,7 @@ package org.entityflakes.entityfilters
 import org.entityflakes.Component
 import org.entityflakes.entitymanager.ComponentRef
 import org.entityflakes.entitymanager.EntityManager
-import org.mistutils.collections.BitVector
+import org.kwrench.collections.BitVector
 import kotlin.reflect.KClass
 
 /**

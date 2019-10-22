@@ -10,7 +10,7 @@ import org.entityflakes.entityfilters.RequiredAndForbiddenComponentsFilter
 import org.entityflakes.entityfilters.RequiredComponentsFilter
 import org.entityflakes.entitygroup.EntityGroup
 import org.entityflakes.entitygroup.EntityGroupListener
-import org.mistutils.symbol.Symbol
+import org.kwrench.symbol.Symbol
 import kotlin.reflect.KClass
 
 /**

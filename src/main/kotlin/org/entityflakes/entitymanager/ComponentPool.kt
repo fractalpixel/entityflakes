@@ -2,7 +2,7 @@ package org.entityflakes.entitymanager
 
 import org.entityflakes.Component
 import org.entityflakes.ReusableComponent
-import org.mistutils.collections.bag.Bag
+import org.kwrench.collections.bag.Bag
 
 /**
  * Handles component creation and deletion, using a pool to recycle components if they support that.

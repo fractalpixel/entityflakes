@@ -2,8 +2,8 @@ package org.entityflakes.entityfactory
 
 import org.entityflakes.Component
 import org.entityflakes.Entity
-import org.mistutils.random.RandomSequence
-import org.mistutils.symbol.Symbol
+import org.kwrench.random.Rand
+import org.kwrench.symbol.Symbol
 import java.util.HashMap
 import kotlin.reflect.KClass
 
@@ -41,7 +41,7 @@ class DefaultEntityFactory(vararg componentTypes: KClass<out Component>): Entity
     }
 
 
-    override fun doCreateEntity(entity: Entity, random: RandomSequence, parameters: Map<Symbol, Any>) {
+    override fun doCreateEntity(entity: Entity, random: Rand, parameters: Map<Symbol, Any>) {
 
         // Create seed to be used for initializing the components and final setup
         val entitySeed = random.nextLong()

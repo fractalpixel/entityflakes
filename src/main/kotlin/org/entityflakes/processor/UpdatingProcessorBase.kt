@@ -1,9 +1,9 @@
 package org.entityflakes.processor
 
-import org.mistutils.time.Time
-import org.mistutils.updating.Updating
-import org.mistutils.updating.strategies.UpdateStrategy
-import org.mistutils.updating.strategies.VariableTimestepStrategy
+import org.kwrench.time.Time
+import org.kwrench.updating.Updating
+import org.kwrench.updating.strategies.UpdateStrategy
+import org.kwrench.updating.strategies.VariableTimestepStrategy
 
 /**
  * A base class for processors that have some update strategy.

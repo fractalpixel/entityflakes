@@ -3,8 +3,8 @@ package org.entityflakes
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import org.mistutils.geometry.double2.MutableDouble2
-import org.mistutils.updating.strategies.CappedFixedTimestepStrategy
+import org.kwrench.geometry.double2.MutableDouble2
+import org.kwrench.updating.strategies.CappedFixedTimestepStrategy
 
 /**
  *

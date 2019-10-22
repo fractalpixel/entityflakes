@@ -42,10 +42,11 @@
 
         <!-- Utils -->
         <dependency>
-            <groupId>com.gitlab.vertexmist</groupId>
-            <artifactId>mistutils</artifactId>
-            <version>0.1.9</version>
+            <groupId>com.github.fractalpixel</groupId>
+            <artifactId>kwrench</artifactId>
+            <version>0.2.1</version>
         </dependency>
+
     </dependencies>
 
 

@@ -2,8 +2,8 @@ package org.entityflakes.storagesystem
 
 import org.entityflakes.Entity
 import org.entityflakes.processor.EntityProcessorBase
-import org.mistutils.time.Time
-import org.mistutils.updating.strategies.VariableTimestepStrategy
+import org.kwrench.time.Time
+import org.kwrench.updating.strategies.VariableTimestepStrategy
 
 /**
  *

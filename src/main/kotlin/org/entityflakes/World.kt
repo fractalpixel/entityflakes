@@ -6,11 +6,11 @@ import org.entityflakes.entitymanager.EntityManager
 import org.entityflakes.processor.Processor
 import org.entityflakes.processor.SimpleEntityProcessor
 import org.entityflakes.processor.SimpleProcessor
-import org.mistutils.service.Service
-import org.mistutils.time.Time
-import org.mistutils.updating.Updating
-import org.mistutils.updating.strategies.UpdateStrategy
-import org.mistutils.updating.strategies.VariableTimestepStrategy
+import org.kwrench.service.Service
+import org.kwrench.time.Time
+import org.kwrench.updating.Updating
+import org.kwrench.updating.strategies.UpdateStrategy
+import org.kwrench.updating.strategies.VariableTimestepStrategy
 import kotlin.reflect.KClass
 
 /**

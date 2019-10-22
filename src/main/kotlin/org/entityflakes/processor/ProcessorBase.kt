@@ -1,7 +1,7 @@
 package org.entityflakes.processor
 
 import org.entityflakes.World
-import org.mistutils.time.Time
+import org.kwrench.time.Time
 
 /**
  * Base class for Processors.

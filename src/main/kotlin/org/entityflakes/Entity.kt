@@ -2,8 +2,8 @@ package org.entityflakes
 
 import org.entityflakes.entitymanager.ComponentRef
 import org.entityflakes.entitymanager.EntitySupport
-import org.mistutils.classes.createInstance
-import org.mistutils.collections.BitVector
+import org.kwrench.classes.createInstance
+import org.kwrench.collections.BitVector
 import java.util.*
 import kotlin.reflect.KClass
 

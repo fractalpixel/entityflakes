@@ -2,8 +2,8 @@ package org.entityflakes.entityfactory
 
 import org.entityflakes.Entity
 import org.entityflakes.World
-import org.mistutils.random.RandomSequence
-import org.mistutils.symbol.Symbol
+import org.kwrench.random.Rand
+import org.kwrench.symbol.Symbol
 import java.lang.IllegalStateException
 
 /**
@@ -16,7 +16,7 @@ abstract class EntityFactoryBase: EntityFactory {
     private lateinit var registeredFactoryId: Symbol
 
     private val emptyParams: Map<Symbol, Any> = emptyMap()
-    private val random = RandomSequence.createDefault()
+    private val random = Rand.createDefault()
 
 
     /**
@@ -70,6 +70,6 @@ abstract class EntityFactoryBase: EntityFactory {
      * The [random] is initialized either with the seed the passed in to createEntity, or based on the current system nano time.
      * The [parameters] are either the ones passed in to createEntity, or an empty map if no parameters given-
      */
-    protected abstract fun doCreateEntity(entity: Entity, random: RandomSequence, parameters: Map<Symbol, Any>)
+    protected abstract fun doCreateEntity(entity: Entity, random: Rand, parameters: Map<Symbol, Any>)
 
 }

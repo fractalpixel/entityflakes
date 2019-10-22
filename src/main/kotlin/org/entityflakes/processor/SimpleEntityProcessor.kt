@@ -3,9 +3,9 @@ package org.entityflakes.processor
 import org.entityflakes.Entity
 import org.entityflakes.entityfilters.AllEntitiesFilter
 import org.entityflakes.entityfilters.EntityFilter
-import org.mistutils.time.Time
-import org.mistutils.updating.strategies.UpdateStrategy
-import org.mistutils.updating.strategies.VariableTimestepStrategy
+import org.kwrench.time.Time
+import org.kwrench.updating.strategies.UpdateStrategy
+import org.kwrench.updating.strategies.VariableTimestepStrategy
 
 /**
  * A processor that runs an update function for entities with the specified components.

@@ -2,7 +2,7 @@ package org.entityflakes.entitygroup
 
 import org.entityflakes.Entity
 import org.entityflakes.entitymanager.EntityManager
-import org.mistutils.collections.BitVector
+import org.kwrench.collections.BitVector
 
 
 /**

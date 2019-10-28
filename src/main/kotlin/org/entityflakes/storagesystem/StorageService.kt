@@ -6,11 +6,10 @@ import org.kwrench.time.Time
 import org.kwrench.updating.strategies.VariableTimestepStrategy
 
 /**
- *
+ * Every x minutes, serialize to buffer, save on other thread
  */
-@Deprecated("Not (yet?) implemented")
 class StorageService(): EntityProcessorBase(VariableTimestepStrategy()) {
     override fun updateEntity(entity: Entity, time: Time) {
-        TODO("Implement")
+
     }
 }

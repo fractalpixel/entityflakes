@@ -7,7 +7,7 @@ import org.entityflakes.entityfilters.EntityFilter
 import org.entityflakes.entitygroup.DynamicEntityGroup
 import org.entityflakes.entitygroup.EntityGroup
 import org.entityflakes.entitygroup.EntityGroupListener
-import org.entityflakes.processor.ProcessorBase
+import org.entityflakes.system.SystemBase
 import org.kwrench.collections.BitVector
 import org.kwrench.collections.bag.Bag
 import org.kwrench.collections.bag.IntBag
@@ -19,7 +19,7 @@ import java.lang.IllegalArgumentException
 /**
  * Default implementation of EntityManager.  Also implements Processor and EntitySupport.
  */
-class DefaultEntityManager(val maxEntityPoolSize: Int = 1024*10): ProcessorBase(), EntityManagerProcessor {
+class DefaultEntityManager(val maxEntityPoolSize: Int = 1024*10): SystemBase(), EntityManagerSystem {
 
     private data class ListenerEntry(val entityFilter: EntityFilter, val listeners: Bag<EntityGroupListener>) {}
 
@@ -166,7 +166,7 @@ class DefaultEntityManager(val maxEntityPoolSize: Int = 1024*10): ProcessorBase(
     }
 
 
-    override fun update(time: Time) {
+    override fun doUpdate(time: Time) {
 
         // Handle added entities
         // Use a do-while loop in case a listener triggers another entity addition

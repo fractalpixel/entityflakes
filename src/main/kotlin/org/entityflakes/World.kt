@@ -1,16 +1,16 @@
 package org.entityflakes
 
-import org.entityflakes.entityfilters.RequiredComponentsFilter
 import org.entityflakes.entitymanager.ComponentRef
 import org.entityflakes.entitymanager.EntityManager
-import org.entityflakes.processor.Processor
-import org.entityflakes.processor.SimpleEntityProcessor
-import org.entityflakes.processor.SimpleProcessor
+import org.entityflakes.system.System
+import org.entityflakes.system.SimpleEntitySystem
+import org.entityflakes.system.SimpleSystem
 import org.kwrench.service.Service
 import org.kwrench.time.Time
 import org.kwrench.updating.Updating
 import org.kwrench.updating.strategies.UpdateStrategy
 import org.kwrench.updating.strategies.VariableTimestepStrategy
+import java.lang.IllegalStateException
 import kotlin.reflect.KClass
 
 /**
@@ -20,65 +20,105 @@ interface World: Service, Updating, EntityManager {
 
     /**
      * The game-time for the World.
-     * Note that different Processors may have own [Time] instances.
+     * Note that different systems may have own [Time] instances.
      */
     val time: Time
 
     /**
-     * The currently registered processors
+     * The currently registered systems
      */
-    val processors: List<Processor>
+    val systems: List<System>
 
     /**
      * @return the processor of the specified type.
-     * If there are several processors of that type, returns the last one added.
-     * Throws an exception if there was no processor of the specified type.
+     * If there are several systems of that type, returns the last one added.
+     * Throws an exception if there was no system of the specified type.
      */
-    operator fun <T: Processor> get(processorType: KClass<T>): T = getOrNull(processorType)!!
+    operator fun <T: System> get(systemType: KClass<T>): T = getOrNull(systemType) ?: throw IllegalStateException("No '${systemType.simpleName}' -system has been added to the world!")
 
     /**
-     * @return the processor of the specified type, or null if not available.
-     * If there are several processors of that type, returns the last one added.
+     * @return the system of the specified type, or null if not available.
+     * If there are several systems of that type, returns the last one added.
      */
-    fun <T: Processor> getOrNull(processorType: KClass<T>): T?
+    fun <T: System> getOrNull(systemType: KClass<T>): T?
 
     /**
-     * @return true if there is a processor of the specified type.
+     * @return true if there is a system of the specified type.
      */
-    fun <T: Processor> has(processorType: KClass<T>): Boolean
+    fun <T: System> has(systemType: KClass<T>): Boolean
 
     /**
-     * Adds a processor.
+     * Adds a system.
      */
-    fun <T : Processor> addProcessor(processor: T): T
+    fun <T : System> addSystem(system: T): T
 
     /**
      * Adds a processor with the specified update function and update strategy.
      * @param updateFunction function to call on each update of this processor.  Gets the world and the time object as parameters.
      * @param updateStrategy how often to run the update function of this processor. Defaults to once per world update.
      */
-    fun addProcessor(updateFunction: (World, Time)->Unit,
-                     updateStrategy: UpdateStrategy = VariableTimestepStrategy()): SimpleProcessor =
-            addProcessor(SimpleProcessor(updateFunction, updateStrategy))
+    fun addSystem(updateStrategy: UpdateStrategy = VariableTimestepStrategy(),
+                  updateFunction: (World, Time)->Unit): SimpleSystem =
+            addSystem(SimpleSystem(updateStrategy, updateFunction))
 
     /**
      * Add a processor that updates entities with the specified components.
-     * @param requiredComponentTypes the component accessors for the components that must be preset for the added processor to process an entity.
+     *
+     * @param requiredComponentTypes the types of the components that must be preset for the added processor to process an entity.
      *                               If no components are specified, the processor will be applied to all entities.
-     *                               Use World.getComponentRef() to get the component accessor of a component class.
-     * @param entityUpdater the function to run for each entity.
      * @param updateStrategy how often to run the update function of this processor. Defaults to once per world update.
+     *                       (Note that you need to pass this as a named argument, as the preceding [requiredComponentTypes] is a vararg).
+     * @param entityUpdater the function to run for each entity.  (Pass either as a named argument, or a function block).
      */
-    fun addEntityProcessor(requiredComponentTypes: Collection<ComponentRef<out Component>>,
-                           entityUpdater: (Entity, Time) -> Unit,
-                           updateStrategy: UpdateStrategy = VariableTimestepStrategy()): SimpleEntityProcessor =
-            addProcessor(SimpleEntityProcessor(RequiredComponentsFilter(requiredComponentTypes.map{it.getComponentTypeId(this)}), entityUpdater, updateStrategy))
+    fun addEntitySystem(vararg requiredComponentTypes: KClass<out Component>,
+                        updateStrategy: UpdateStrategy = VariableTimestepStrategy(),
+                        entityUpdater: (Entity, Time) -> Unit): SimpleEntitySystem =
+            addSystem(SimpleEntitySystem(
+                    this,
+                    *requiredComponentTypes,
+                    updateStrategy= updateStrategy,
+                    entityUpdater= entityUpdater))
+
+    /**
+     * Add a processor that updates entities with the specified components.
+     *
+     * @param requiredComponentTypes the types for the components that must be preset for the added processor to process an entity.
+     *                               If no components are specified, the processor will be applied to all entities.
+     * @param updateStrategy how often to run the update function of this processor. Defaults to once per world update.
+     *                       (Note that you need to pass this as a named argument, as the preceding [requiredComponentTypes] is a vararg).
+     * @param entityUpdater the function to run for each entity.  (Pass either as a named argument, or a function block).
+     */
+    fun addEntitySystem(requiredComponentTypes: Collection<KClass<Component>>,
+                        updateStrategy: UpdateStrategy = VariableTimestepStrategy(),
+                        entityUpdater: (Entity, Time) -> Unit): SimpleEntitySystem =
+            addEntitySystem(*requiredComponentTypes.toTypedArray(), updateStrategy = updateStrategy, entityUpdater = entityUpdater)
+
+    /**
+     * Add a processor that updates entities with the specified components.
+     *
+     * First in the parameter list, pass in the component accessors for the components that must be preset for
+     * the added processor to process an entity (at least one must be specified).  Use World.getComponentRef() to get the component accessor of a component class.
+     *
+     * @param updateStrategy how often to run the update function of this processor. Defaults to once per world update.
+     *                       (Note that you need to pass this as a named argument, as the preceding [requiredComponentTypes] is a vararg).
+     * @param entityUpdater the function to run for each entity.  (Pass either as a named argument, or a function block).
+     */
+    fun addEntitySystem(firstRequiredComponentRef: ComponentRef<out Component>,
+                        vararg additionalRequiredComponentRefs: ComponentRef<out Component>,
+                        updateStrategy: UpdateStrategy = VariableTimestepStrategy(),
+                        entityUpdater: (Entity, Time) -> Unit): SimpleEntitySystem =
+            addSystem(SimpleEntitySystem(
+                    this,
+                    firstRequiredComponentRef,
+                    *additionalRequiredComponentRefs,
+                    updateStrategy= updateStrategy,
+                    entityUpdater= entityUpdater))
 
     /**
      * Removes a processor.
      * @return true if the processor was found and removed.
      */
-    fun <T : Processor> removeProcessor(processor: T): Boolean
+    fun <T : System> removeSystem(processor: T): Boolean
 
     /**
      * Start running an update loop, repeatedly calling step.

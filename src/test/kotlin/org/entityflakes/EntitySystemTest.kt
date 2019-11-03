@@ -20,35 +20,26 @@ class EntitySystemTest {
 
         var stopTime = 1
 
-        world.addProcessor({world, time ->
+        world.addSystem(){ world, time ->
             if (time.secondsSinceStart > stopTime) world.stop()
-        })
+        }
 
-        world.addEntityProcessor(
-                listOf(named),
-                {entity, time ->
-                    entity[named]!!.name = "Igor"+time.secondsSinceStart
-                })
+        world.addEntitySystem(named) { entity, time ->
+            entity[named]!!.name = "Igor"+time.secondsSinceStart
+        }
 
-        world.addEntityProcessor(
-                listOf(positioned),
-                {entity, time ->
-                    val position: Positioned = entity[positioned]!!
-                    position.pos.x += time.stepDurationSeconds * 1.0
-                })
+        world.addEntitySystem(Positioned::class) { entity, time ->
+            val position: Positioned = entity[positioned]!!
+            position.pos.x += time.stepDurationSeconds * 1.0
+        }
 
-        world.addEntityProcessor(
-                listOf(named, positioned),
-                {entity, time ->
-                    entity[named]!!.name = "Orcus" + entity[positioned]!!.pos.x
-                })
+        world.addEntitySystem(Named::class, Positioned::class) { entity, time ->
+            entity[named]!!.name = "Orcus" + entity[positioned]!!.pos.x
+        }
 
-        world.addEntityProcessor(
-                emptyList(),
-                {entity, time ->
-                    println("${time.secondsSinceStart}: entity id: ${entity.id}, name: ${entity[named]?.name}, pos: ${entity[positioned]?.pos}")
-                },
-                CappedFixedTimestepStrategy(0.5))
+        world.addEntitySystem(updateStrategy = CappedFixedTimestepStrategy(0.5)) { entity, time ->
+            println("${time.secondsSinceStart}: entity id: ${entity.id}, name: ${entity[named]?.name}, pos: ${entity[positioned]?.pos}")
+        }
 
         world.createEntityWithTypes(named, positioned)
         val e2 = world.createEntityWithTypes(named, positioned)

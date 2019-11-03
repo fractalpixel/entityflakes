@@ -2,8 +2,8 @@ package org.entityflakes
 
 import org.entityflakes.entitymanager.DefaultEntityManager
 import org.entityflakes.entitymanager.EntityManager
-import org.entityflakes.entitymanager.EntityManagerProcessor
-import org.entityflakes.processor.Processor
+import org.entityflakes.entitymanager.EntityManagerSystem
+import org.entityflakes.system.System
 import org.kwrench.service.ServiceBase
 import org.kwrench.service.ServiceProvider
 import org.kwrench.time.RealTime
@@ -22,11 +22,11 @@ class DefaultWorld(var updateStrategy: UpdateStrategy = FixedTimestepStrategy(),
                    override var time: Time = RealTime(),
                    var targetUpdatesPerSecond: Double = 100.0,
                    val sleepForSurplusTime: Boolean = true,
-                   val entityManager: EntityManagerProcessor = DefaultEntityManager()) :
+                   val entityManager: EntityManagerSystem = DefaultEntityManager()) :
         ServiceBase(), World, EntityManager by entityManager {
 
-    override val processors = ArrayList<Processor>()
-    private val processorsByType = HashMap<Class<out Processor>, Processor>()
+    override val systems = ArrayList<System>()
+    private val processorsByType = HashMap<Class<out System>, System>()
 
     private val stopRequested_: AtomicBoolean = AtomicBoolean(false)
     private val running: AtomicBoolean = AtomicBoolean(false)
@@ -41,15 +41,15 @@ class DefaultWorld(var updateStrategy: UpdateStrategy = FixedTimestepStrategy(),
     }
 
     init {
-        addProcessor(entityManager)
+        addSystem(entityManager)
     }
 
-    override fun <T : Processor> getOrNull(processorType: KClass<T>): T? = processorsByType[processorType.java] as T?
-    override fun <T : Processor> has(processorType: KClass<T>): Boolean = processorsByType.containsKey(processorType.java)
+    override fun <T : System> getOrNull(processorType: KClass<T>): T? = processorsByType[processorType.java] as T?
+    override fun <T : System> has(processorType: KClass<T>): Boolean = processorsByType.containsKey(processorType.java)
 
-    override fun <T : Processor> addProcessor(processor: T): T {
+    override fun <T : System> addSystem(processor: T): T {
         if (shutdown) throw IllegalStateException("Can not add processors after dispose")
-        processors.add(processor)
+        systems.add(processor)
         processorsByType.put(processor.typeCategory, processor)
 
         // Tell the processor it was added (so that it can form a link to us)
@@ -61,15 +61,15 @@ class DefaultWorld(var updateStrategy: UpdateStrategy = FixedTimestepStrategy(),
         return processor
     }
 
-    override fun <T : Processor> removeProcessor(processor: T): Boolean {
-        val removed = processors.remove(processor)
+    override fun <T : System> removeSystem(processor: T): Boolean {
+        val removed = systems.remove(processor)
 
         if (removed) {
             val processorType = processor.typeCategory
             processorsByType.remove(processorType)
 
             // Replace with last added processor of the same type
-            val replacement = processors.findLast { it.typeCategory == processorType }
+            val replacement = systems.findLast { it.typeCategory == processorType }
             if (replacement != null) processorsByType[processorType] = replacement
         }
 
@@ -79,7 +79,7 @@ class DefaultWorld(var updateStrategy: UpdateStrategy = FixedTimestepStrategy(),
 
     override fun doInit(serviceProvider: ServiceProvider?) {
         // Initialize processors
-        for (processor in processors) {
+        for (processor in systems) {
             processor.init(this)
         }
     }
@@ -122,7 +122,7 @@ class DefaultWorld(var updateStrategy: UpdateStrategy = FixedTimestepStrategy(),
     }
 
     private fun doUpdate(time: Time) {
-        for (processor in processors) {
+        for (processor in systems) {
             processor.update(time)
         }
     }
@@ -143,7 +143,7 @@ class DefaultWorld(var updateStrategy: UpdateStrategy = FixedTimestepStrategy(),
 
     override fun doShutdown() {
         // Dispose processors
-        for (processor in processors.reversed()) {
+        for (processor in systems.reversed()) {
             processor.dispose()
         }
     }

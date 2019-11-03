@@ -4,7 +4,7 @@ import org.kwrench.collections.BitVector
 
 
 /**
- *
+ * A filter that matches all entities in the world.
  */
 object AllEntitiesFilter : EntityFilter {
 

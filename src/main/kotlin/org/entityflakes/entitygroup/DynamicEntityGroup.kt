@@ -5,7 +5,7 @@ import org.entityflakes.entityfilters.EntityFilter
 import org.entityflakes.entitymanager.EntityManager
 
 /**
- * An EntityGroup that listens to the entities in the world and updates the group contents on the fly.
+ * An EntityGroup that listens to the entities in the world and updates the group contents on the fly based on a filter.
  */
 class DynamicEntityGroup(var filter: EntityFilter, entityManager: EntityManager): EntityGroupBase(entityManager) {
 

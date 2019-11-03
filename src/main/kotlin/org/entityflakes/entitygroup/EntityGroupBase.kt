@@ -16,7 +16,7 @@ abstract class EntityGroupBase(val entityManager: EntityManager): EntityGroup {
     override fun forEachEntity(entityVisitor: (Entity) -> Unit) {
         var id = 0
         do  {
-            id = entityIds.nextSetBit(id+1)
+            id = entityIds.nextSetBit(id + 1)
             if (id > 0) {
                 entityVisitor(entityManager.getEntity(id)!!)
             }

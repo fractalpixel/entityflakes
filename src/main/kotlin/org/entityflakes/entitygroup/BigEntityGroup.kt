@@ -23,7 +23,7 @@ class BigEntityGroup(entityManager: EntityManager): EntityGroupBase(entityManage
      * Add entity, if not already added.
      * Notifies listeners of this group.
      */
-    override public fun addEntity(entity: Entity) {
+    public override fun addEntity(entity: Entity) {
         super.addEntity(entity)
         entity.addListener(entityDeletionListener)
     }
@@ -32,7 +32,7 @@ class BigEntityGroup(entityManager: EntityManager): EntityGroupBase(entityManage
      * Remove entity, if contained.
      * Notifies listeners of this group.
      */
-    override public fun removeEntity(entity: Entity) {
+    public override fun removeEntity(entity: Entity) {
         super.removeEntity(entity)
         entity.removeListener(entityDeletionListener)
     }
@@ -41,7 +41,7 @@ class BigEntityGroup(entityManager: EntityManager): EntityGroupBase(entityManage
      * Removes all entities in this group.
      * Notifies listeners.
      */
-    override public fun removeAllEntities() {
+    public override fun removeAllEntities() {
         super.removeAllEntities()
     }
 

@@ -2,6 +2,7 @@ package org.entityflakes.entitygroup
 
 import org.entityflakes.Entity
 import org.entityflakes.EntityListener
+import org.kwrench.collections.bag.Bag
 import java.util.*
 
 /**
@@ -11,7 +12,7 @@ import java.util.*
  */
 class SmallEntityGroup(): EntityGroup {
 
-    private val entities_ = ArrayList<Entity>()
+    private val entities_ = Bag<Entity>()
     private val listeners = ArrayList<EntityGroupListener>()
 
     private val entityDeletionListener = object : EntityListener {
@@ -23,16 +24,16 @@ class SmallEntityGroup(): EntityGroup {
     /**
      * The entities currently in this group.
      */
-    val entities: List<Entity> = entities_
+    val entities: Iterable<Entity> = entities_
 
     override fun forEachEntity(entityVisitor: (Entity) -> Unit) {
-        for (i in 0 .. entities_.size - 1) {
+        for (i in 0 until entities_.size()) {
             entityVisitor(entities_[i])
         }
     }
 
     override fun contains(entityId: Int): Boolean {
-        for (i in 0 .. entities_.size - 1) {
+        for (i in 0 until entities_.size()) {
             if (entities_[i].id == entityId) return true
         }
         return false
@@ -71,10 +72,12 @@ class SmallEntityGroup(): EntityGroup {
      * Notifies listeners.
      */
     fun removeAllEntities() {
-        var e = entities_.lastOrNull()
-        while (e != null) {
+        while (!entities_.isEmpty) {
+            // Get last
+            val e = entities_.get(entities_.size() - 1)
+
+            // Remove it
             removeEntity(e)
-            e = entities_.lastOrNull()
         }
     }
 

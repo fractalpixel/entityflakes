@@ -117,6 +117,30 @@ class Entity internal constructor(val entitySupport: EntitySupport, var id: Int 
             get(componentType.java)
 
     /**
+     * @return the existing component of the specified type in the entity, or if not found,
+     * creates a new component of that type, adds it to the entity, and returns the component.
+     */
+    fun <T: Component> getOrCreate(componentType: KClass<T>): T = get(componentType) ?: createComponent(componentType)
+
+    /**
+     * @return the existing component of the specified type in the entity, or if not found,
+     * creates a new component of that type, adds it to the entity, and returns the component.
+     */
+    fun <T: Component> getOrCreate(componentType: Class<T>): T = get(componentType) ?: createComponent(componentType)
+
+    /**
+     * @return the existing component of the specified type in the entity, or if not found,
+     * creates a new component of that type, adds it to the entity, and returns the component.
+     */
+    fun <T: Component> getOrCreate(componentRef: ComponentRef<T>): T = get(componentRef) ?: createComponent(componentRef)
+
+    /**
+     * Create and add a component of the specified type to this entity.
+     * Returns the created component.
+     */
+    fun <T: Component>createComponent(componentType: Class<T>): T = createComponent(componentType.kotlin)
+
+    /**
      * Create and add a component of the specified type to this entity.
      * Returns the created component.
      */

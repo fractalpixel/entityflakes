@@ -24,7 +24,7 @@ abstract class EntityFactoryBase: EntityFactory {
      * Throws an exception if accessed before the factory is added to the world.
      */
     val world: World get() {
-        if (!initialized) throw IllegalStateException("This entity factory is not yet added to a World, so can't access the world.")
+        check(initialized) { "This entity factory is not yet added to a World, so can't access the world." }
         return registeredWorld
     }
 
@@ -33,12 +33,12 @@ abstract class EntityFactoryBase: EntityFactory {
      * Throws an exception if accessed before the factory is added to the world.
      */
     val factoryId: Symbol get() {
-        if (!initialized) throw IllegalStateException("This entity factory is not yet added to a World, so can't access the identifier that it was added with.")
+        check(initialized) { "This entity factory is not yet added to a World, so can't access the identifier that it was added with." }
         return registeredFactoryId
     }
 
     final override fun init(world: World, factoryId: Symbol) {
-        if (initialized) throw IllegalStateException("The EntityFactory is already initialized! (init(world) has already been called).  Make sure it is not added twice.")
+        check(!initialized) { "The EntityFactory is already initialized! (init(world) has already been called).  Make sure it is not added twice." }
         registeredWorld = world
         registeredFactoryId = factoryId
         initialized = true
@@ -47,7 +47,7 @@ abstract class EntityFactoryBase: EntityFactory {
     }
 
     final override fun createEntity(randomSeed: Long?, parameters: Map<Symbol, Any>?): Entity {
-        if (!initialized) throw IllegalStateException("Can't create entity with entity factory, the entity factory has not yet been added registered with the world.  Use world.registerEntityFactory(factory).")
+        check(initialized) { "Can't create entity with entity factory, the entity factory has not yet been added registered with the world.  Use world.registerEntityFactory(factory)." }
 
         val seed = (randomSeed ?: (System.nanoTime() + world.entityCount))
         val params = parameters ?: emptyParams

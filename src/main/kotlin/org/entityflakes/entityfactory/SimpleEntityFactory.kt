@@ -7,27 +7,21 @@ import org.kwrench.symbol.Symbol
 import java.util.HashMap
 import kotlin.reflect.KClass
 
-
 /**
  * Utility for making repeated initialization of complex entities easier.
  * Describes what components an entity has, and can provide custom initialization for them.
  * Create entity instances with a single function call.
+ *
+ * @param entityInitializer An initialization function that will run after all the components have been created and initialized.
+ * Can do any final holistic initialization needed, or use this to do all initialization.
  */
-// NOTE: API for this may still change.
-// TODO: Perhaps create an interface for component initializers, so that it's easier to use from java as well.  In general usage from java needs work.
-class DefaultEntityFactory(vararg componentTypes: KClass<out Component>): EntityFactoryBase() {
-
-    val componentTypes: MutableList<KClass<out Component>> = ArrayList(componentTypes.toList())
-    val initializers: MutableMap<KClass<out Component>, InitializationContext.(component: Component) -> Unit> = HashMap()
-
-    /**
-     * An initialization function that will run after all the components have been created and initialized.
-     * Can do any final holistic initialization needed.
-     */
-    var entityInitializer: (InitializationContext.(entity: Entity) -> Unit)? = null
-
+class SimpleEntityFactory(vararg componentTypes: KClass<out Component>,
+                          var entityInitializer: ((context: InitializationContext) -> Unit)? = null): EntityFactoryBase() {
 
     private val context: InitializationContextImpl = InitializationContextImpl()
+
+    val componentTypes: MutableList<KClass<out Component>> = ArrayList(componentTypes.toList())
+    val initializers: MutableMap<KClass<out Component>, (context: InitializationContext, component: Component) -> Unit> = HashMap()
 
     /**
      * Specify initializer to run for the specified [componentType] when creating entities of this entityfactory.
@@ -35,9 +29,9 @@ class DefaultEntityFactory(vararg componentTypes: KClass<out Component>): Entity
      * the entity that the component belongs to, a random sequence, and any parameters passed in to the [createEntity] function.
      */
     fun <T: Component>setComponentInitializer(componentType: KClass<T>,
-                                              initializer: InitializationContext.(component: T) -> Unit) {
+                                              initializer: (context: InitializationContext, component: T) -> Unit) {
         if (!componentTypes.contains(componentType)) componentTypes.add(componentType)
-        initializers[componentType] = initializer as InitializationContext.(component: Component) -> Unit
+        initializers[componentType] = initializer as (context: InitializationContext, component: Component) -> Unit
     }
 
 
@@ -64,7 +58,7 @@ class DefaultEntityFactory(vararg componentTypes: KClass<out Component>): Entity
                 random.setSeed(entitySeed, componentType.hashCode().toLong())
 
                 // Invoke initializer
-                context.initializer(component)
+                initializer(context, component)
             }
         }
 
@@ -72,7 +66,7 @@ class DefaultEntityFactory(vararg componentTypes: KClass<out Component>): Entity
         val entityInit = entityInitializer
         if (entityInit != null) {
             random.setSeed(entitySeed)
-            context.entityInit(entity)
+            entityInit(context)
         }
     }
 

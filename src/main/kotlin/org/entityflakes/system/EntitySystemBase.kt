@@ -58,15 +58,23 @@ abstract class EntitySystemBase(var filter: EntityFilter? = AllEntitiesFilter,
         // Initialize
         doInit(world, entities)
 
-        // Notify system of each entity that it handles
-        entities.forEachEntity { onEntityAdded(it) }
-        entities.addListener(this)
+        if (listenToEntityGroup) {
+            // Notify system of each entity that it handles
+            entities.forEachEntity { onEntityAdded(it) }
+
+            // Notify this system about entities added and removed to the entities it handles
+            entities.addListener(this)
+        }
     }
 
     final override fun doDispose() {
-        // Notify system of each entity it no longer handles
-        entities.removeListener(this)
-        entities.forEachEntity { onEntityRemoved(it) }
+        if (listenToEntityGroup) {
+            // Stop listening to entities
+            entities.removeListener(this)
+
+            // Notify system of each entity it no longer handles
+            entities.forEachEntity { onEntityRemoved(it) }
+        }
 
         doFinalDispose()
     }
@@ -90,13 +98,13 @@ abstract class EntitySystemBase(var filter: EntityFilter? = AllEntitiesFilter,
     /**
      * If [listenToEntityGroup] is true, this is called when an entity starts to match the filter used by this processor.
      */
-    abstract override fun onEntityAdded(entity: Entity)
+    override fun onEntityAdded(entity: Entity) {}
 
     /**
      * If [listenToEntityGroup] is true, this is called when an entity no longer matches the filter used by this processor
      * (e.g. deleted or a required component removed).
      */
-    abstract override fun onEntityRemoved(entity: Entity)
+    override fun onEntityRemoved(entity: Entity) {}
 
     /**
      * Called before entities are updated

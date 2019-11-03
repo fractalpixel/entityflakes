@@ -69,11 +69,4 @@ class SimpleEntitySystem(filter: EntityFilter = AllEntitiesFilter,
         entityUpdater(entity, time)
     }
 
-    override fun onEntityAdded(entity: Entity) {
-        // Not used
-    }
-
-    override fun onEntityRemoved(entity: Entity) {
-        // Not used
-    }
 }

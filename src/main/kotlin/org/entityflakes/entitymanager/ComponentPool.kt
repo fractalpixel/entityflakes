@@ -8,10 +8,11 @@ import org.kwrench.collections.bag.Bag
  * Handles component creation and deletion, using a pool to recycle components if they support that.
  */
 class ComponentPool<T: Component>(val type: Class<T>,
-                                  val maxObjectPoolSize: Int = 1024*16) {
+                                  val maxPoolSize: Int = 1024*16) {
 
     val reusable: Boolean = ReusableComponent::class.java.isAssignableFrom(type)
-    val pool: Bag<T>? = if (reusable) Bag<T>(maxObjectPoolSize / 16) else null
+
+    private val pool: Bag<T>? = if (reusable) Bag(maxPoolSize / 16) else null
 
     fun createComponent(): T {
         return pool?.removeLast() ?: createComponentInstance()
@@ -21,17 +22,13 @@ class ComponentPool<T: Component>(val type: Class<T>,
      * Reset the component and add it to the component pool, or call dispose on the component if the pool is full or the component is not reusable.
      */
     fun releaseComponent(component: T) {
-        if (reusable && pool!!.size() < maxObjectPoolSize) {
+        if (reusable && pool!!.size() < maxPoolSize) {
             (component as ReusableComponent).reset()
             pool.add(component)
         }
         else {
             component.dispose()
         }
-    }
-
-    private fun createComponentInstance(): T {
-        return type.newInstance()
     }
 
     /**
@@ -44,6 +41,10 @@ class ComponentPool<T: Component>(val type: Class<T>,
             }
             pool.clear()
         }
+    }
+
+    private fun createComponentInstance(): T {
+        return type.newInstance()
     }
 
 }

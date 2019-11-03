@@ -48,7 +48,7 @@ class DefaultWorld(var updateStrategy: UpdateStrategy = FixedTimestepStrategy(),
     override fun <T : System> has(processorType: KClass<T>): Boolean = processorsByType.containsKey(processorType.java)
 
     override fun <T : System> addSystem(processor: T): T {
-        if (shutdown) throw IllegalStateException("Can not add processors after dispose")
+        check(!shutdown) { "Can not add processors after dispose" }
         systems.add(processor)
         processorsByType.put(processor.typeCategory, processor)
 
@@ -87,7 +87,7 @@ class DefaultWorld(var updateStrategy: UpdateStrategy = FixedTimestepStrategy(),
     override fun start() {
         // Initialize if not yet initialized
         if (!initialized) init()
-        if (shutdown) throw IllegalStateException("Can not call start after dispose")
+        check(!shutdown) { "Can not call start after dispose" }
 
         // Loop until stop or dispose is called
         stopRequested_.set(false)
@@ -104,8 +104,8 @@ class DefaultWorld(var updateStrategy: UpdateStrategy = FixedTimestepStrategy(),
     }
 
     override fun step() {
-        if (!initialized) throw IllegalStateException("Init needs to be called before step")
-        if (shutdown) throw IllegalStateException("Can not call step after dispose")
+        check(initialized) { "Init needs to be called before step" }
+        check(!shutdown) { "Can not call step after dispose" }
 
         // Step timer
         time.nextStep()

@@ -10,20 +10,22 @@ import kotlin.reflect.KClass
 /**
  * Represents some object in a World.  The Entity has no state itself, it is instead composed
  * of components that describe different aspects of the entity, and carry state for that aspect.
- * <p>
+ *
  * E.g. one component could contain the position of the entity in the world, another the appearance,
  * a third contain properties needed for entities that should be simulated with a physics engine, and so on.
- * <p>
+ *
  * It is faster to access components of an entity with componentIds instead of the component type, especially in tight loops.
  * The EntityManager (also implemented by the World) can be used to get the componentId of a specific component type.
- * <p>
+ *
  * Entities should not be instantiated by client code, instead use world.createEntity()
  */
-// TODO: store components and component ids(?) in a bag (and intbag?)
 class Entity internal constructor(val entitySupport: EntitySupport, var id: Int = 0) {
 
-    private var components = Array<Component?>(INITIAL_SIZE, {null})
+    // TODO: store components and component ids(?) in a bag (and intbag?) - would save memory
+//       if there are many component types, would it speed things up?
+    private var components = Array<Component?>(INITIAL_SIZE) {null}
     internal val containedComponents = BitVector()
+
     internal var entityAdditionCompleted: Boolean = false
     private var listeners: ArrayList<EntityListener>? = null
 
@@ -38,7 +40,7 @@ class Entity internal constructor(val entitySupport: EntitySupport, var id: Int 
      * Sets the specified component in this entity to the specified value, replacing any earlier component of that type.
      */
     operator fun set(componentId: Int, component: Component?) {
-        if (componentId < 1 || componentId > entitySupport.maxComponentId) throw IllegalArgumentException("component id $componentId is out of range (1 .. ${entitySupport.maxComponentId})")
+        require(componentId >= 1 && componentId <= entitySupport.maxComponentId) { "component id $componentId is out of range (1 .. ${entitySupport.maxComponentId})" }
 
         // Grow components array if necessary
         if (componentId > components.size) {
@@ -90,8 +92,8 @@ class Entity internal constructor(val entitySupport: EntitySupport, var id: Int 
      * @return the component with the specified type id, or null if this entity does not have such a component.
      */
     operator fun <T: Component> get(componentId: Int): T? {
-        if (componentId <= 0 || componentId > components.size) return null
-        else return components[componentId-1] as T?
+        return if (componentId <= 0 || componentId > components.size) null
+               else components[componentId-1] as T?
     }
 
     /**
@@ -225,8 +227,8 @@ class Entity internal constructor(val entitySupport: EntitySupport, var id: Int 
      * @return true if this entity contains the specified component type
      */
     fun contains(componentId: Int): Boolean {
-        if (componentId <= 0 || componentId > components.size) return false
-        else return components[componentId-1] != null
+        return if (componentId <= 0 || componentId > components.size) false
+               else components[componentId-1] != null
     }
 
     /**
@@ -258,11 +260,11 @@ class Entity internal constructor(val entitySupport: EntitySupport, var id: Int 
     internal fun reset(disposeComponents: Boolean = false) {
         notifyListenersAboutDeletion()
 
-        for (i in 0..components.size-1) {
+        for (i in 0 until components.size) {
             val component = components[i]
             if (component != null) {
                 if (disposeComponents) component.dispose()
-                else entitySupport.releaseComponent(i+1, component)
+                else entitySupport.releaseComponent(i + 1, component)
                 components[i] = null
             }
         }
@@ -274,7 +276,7 @@ class Entity internal constructor(val entitySupport: EntitySupport, var id: Int 
 
     private fun notifyListenersAboutDeletion() {
         if (listeners != null) {
-            for (i in 0 .. listeners!!.size - 1) {
+            for (i in 0 until listeners!!.size) {
                 listeners!![i].onEntityRemoved(this)
             }
             listeners?.clear()
@@ -287,7 +289,7 @@ class Entity internal constructor(val entitySupport: EntitySupport, var id: Int 
     internal fun dispose() = reset(true)
 
     companion object {
-        private val INITIAL_SIZE = 4
-        private val EXTRA_SIZE = 3
+        private const val INITIAL_SIZE = 4
+        private const val EXTRA_SIZE = 3
     }
 }

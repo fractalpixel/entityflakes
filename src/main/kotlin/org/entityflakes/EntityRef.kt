@@ -11,8 +11,8 @@ class EntityRef() {
 
     private var referencedEntityId: Int = 0
     private var world: World? = null
-    private @Transient var cachedRef: Entity? = null
-    private @Transient var listenerRegistered: Boolean = false
+    @Transient private var cachedRef: Entity? = null
+    @Transient private var listenerRegistered: Boolean = false
     private val listener: EntityGroupListener = object : EntityGroupListener {
         override fun onEntityAdded(entity: Entity) {
         }
@@ -56,13 +56,13 @@ class EntityRef() {
      */
     var entity: Entity?
         get(): Entity? {
-            if (referencedEntityId == 0) return null
-            else {
-                if (cachedRef == null) {
-                    cachedRef = world!!.getEntity(referencedEntityId)
+            return if (referencedEntityId == 0) null
+                else {
+                    if (cachedRef == null) {
+                        cachedRef = world!!.getEntity(referencedEntityId)
+                    }
+                    cachedRef
                 }
-                return cachedRef
-            }
         }
         set(newEntity) {
             val newId = newEntity?.id ?: 0
